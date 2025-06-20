@@ -5,7 +5,6 @@ This app is a Vite+React blackjack game that uses Firebase for its backend (auth
 ## Features
 - Multiplayer blackjack gameplay
 - Dealer and admin panels
-- Wallet and transaction management
 - Firebase Auth and Firestore integration
 
 ## Getting Started
@@ -20,3 +19,4 @@ Deploy easily to Firebase Hosting or any static hosting provider.
 ---
 
 For more information, see the Firebase documentation."# blackjackroyal" 
+"# blackjackroyal" 
