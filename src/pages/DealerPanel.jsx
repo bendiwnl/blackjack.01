@@ -1,10 +1,10 @@
-
 import React, { useState, useEffect } from "react";
 import { Game } from "@/api/entities";
 import { Player } from "@/api/entities";
 import { User } from "@/api/entities";
 import { Eye, Users, TrendingUp, Clock } from "lucide-react";
 import PlayingCard from "../components/game/PlayingCard";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 
 export default function DealerPanel() {
   // all the states

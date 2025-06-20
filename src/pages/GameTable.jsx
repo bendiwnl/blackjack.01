@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Game } from "@/api/entities";
 import { Player } from "@/api/entities";
@@ -256,7 +255,8 @@ export default function GameTable() {
         split_bet: 0,
         split_hand_value: 0,
         split_status: 'waiting',
-        active_hand_index: 0
+        active_hand_index: 0,
+        created_by: user.email
       });
       
       setCurrentPlayer(newPlayer);
@@ -391,14 +391,13 @@ export default function GameTable() {
         await waitForSeconds(300);
       }
 
-      await waitForSeconds(500); 
-      
+      await waitForSeconds(500); // Add this delay to ensure Firestore updates
       // get updated players
-      const updatedPlayers = await Player.filter({ 
+      const updatedPlayers = (await Player.filter({ 
         game_id: game.id, 
-        is_active: true, 
-        bet: { $gt: 0 } 
-      });
+        is_active: true
+      })).filter(p => p.bet > 0); // Filter bet > 0 in JS
+      console.log("updatedPlayers after deal:", updatedPlayers);
       
       const playersToAct = updatedPlayers
         .filter(p => p.status === 'playing')
@@ -426,6 +425,9 @@ export default function GameTable() {
       setTimeout(() => setStatusMessage(""), 2000);
 
       await loadGameData(game.id);
+
+      console.log("playersToAct", playersToAct);
+      console.log("nextTurn", nextTurn);
 
       if (nextTurn === 'dealer') {
         await waitForSeconds(2000);
@@ -799,6 +801,11 @@ export default function GameTable() {
     isMyTurn = isMainHandTurn || isSplitHandTurn;
   }
 
+  console.log("user:", user);
+  console.log("players:", players);
+  console.log("myPlayer:", myPlayer);
+  console.log("game:", game);
+
   return (
     <div className="min-h-[calc(100vh-150px)] bg-gray-900 p-4 sm:p-6 font-serif flex flex-col">
       <div className="w-full max-w-7xl mx-auto flex-grow flex flex-col">
@@ -1061,7 +1068,7 @@ export default function GameTable() {
         )}
       </div>
       
-      <style jsx>{`
+      <style>{`
         .blackjack-table-container {
           width: 100%;
           display: flex;

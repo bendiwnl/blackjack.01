@@ -1,16 +1,27 @@
-
-
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { User } from "@/api/entities";
 import { Spade, Users, BarChart3, LogOut, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth } from "@/api/firebaseClient";
 
 export default function Layout({ children, currentPageName }) {
   const location = useLocation();
   const [user, setUser] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [loginEmail, setLoginEmail] = React.useState('');
+  const [loginPassword, setLoginPassword] = React.useState('');
+  const [loginError, setLoginError] = React.useState('');
+  const [signupEmail, setSignupEmail] = React.useState('');
+  const [signupPassword, setSignupPassword] = React.useState('');
+  const [signupError, setSignupError] = React.useState('');
+  const [signupSuccess, setSignupSuccess] = React.useState('');
+  const [showAdminModal, setShowAdminModal] = React.useState(false);
+  const [adminPassword, setAdminPassword] = React.useState('');
+  const [adminError, setAdminError] = React.useState('');
+  const SECRET_ADMIN_PASSWORD = "admin12345"; // Change this for production!
 
   // load user data when component mounts
   React.useEffect(() => {
@@ -34,6 +45,43 @@ export default function Layout({ children, currentPageName }) {
     window.location.reload();
   };
 
+  const handleLogin = async () => {
+    try {
+      await User.login(loginEmail, loginPassword);
+      window.location.reload();
+    } catch (err) {
+      setLoginError(err.message);
+    }
+  };
+
+  const handleSignup = async () => {
+    setSignupError('');
+    setSignupSuccess('');
+    try {
+      await createUserWithEmailAndPassword(auth, signupEmail, signupPassword);
+      setSignupSuccess('Account created! You can now log in.');
+      setSignupEmail('');
+      setSignupPassword('');
+    } catch (err) {
+      setSignupError(err.message);
+    }
+  };
+
+  const handleAdminPromotion = async () => {
+    setAdminError('');
+    if (adminPassword === SECRET_ADMIN_PASSWORD) {
+      try {
+        await User.updateMyUserData({ role: 'admin', is_dealer: true });
+        setShowAdminModal(false);
+        window.location.reload();
+      } catch (err) {
+        setAdminError('Failed to promote to admin.');
+      }
+    } else {
+      setAdminError('Incorrect admin password.');
+    }
+  };
+
   // if still loading, show spinner
   if (isLoading) {
     return (
@@ -53,12 +101,82 @@ export default function Layout({ children, currentPageName }) {
           </div>
           <h1 className="text-3xl font-bold text-white mb-4 tracking-wider">BlackJack Royale</h1>
           <p className="text-gray-400 mb-8">An exclusive gaming experience awaits.</p>
-          <Button
-            onClick={() => User.login()}
-            className="w-full h-14 bg-red-700 text-white font-semibold rounded-lg shadow-lg hover:bg-red-600 transition-all duration-200 border-0 text-lg"
-          >
-            Enter Casino
-          </Button>
+          <form className="mb-4 text-left" onSubmit={async (e) => {
+            e.preventDefault();
+            try {
+              await User.login(loginEmail, loginPassword);
+              window.location.reload();
+            } catch (err) {
+              setLoginError(err.message);
+            }
+          }}>
+            <label htmlFor="login-email" className="block text-gray-300 mb-1">Email</label>
+            <input
+              id="login-email"
+              type="email"
+              placeholder="Email"
+              value={loginEmail}
+              onChange={e => setLoginEmail(e.target.value)}
+              className="mb-3 p-3 rounded w-full bg-gray-900 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-red-600"
+              autoComplete="email"
+              required
+            />
+            <label htmlFor="login-password" className="block text-gray-300 mb-1">Password</label>
+            <input
+              id="login-password"
+              type="password"
+              placeholder="Password"
+              value={loginPassword}
+              onChange={e => setLoginPassword(e.target.value)}
+              className="mb-3 p-3 rounded w-full bg-gray-900 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-red-600"
+              autoComplete="current-password"
+              required
+            />
+            <button
+              type="submit"
+              className="w-full h-14 bg-red-700 text-white font-semibold rounded-lg shadow-lg hover:bg-red-600 transition-all duration-200 border-0 text-lg"
+            >
+              Enter Casino
+            </button>
+          </form>
+          {loginError && <div className="text-red-500 mt-2">{loginError}</div>}
+
+          {/* Sign Up Form */}
+          <div className="mt-8 border-t border-gray-700 pt-8">
+            <h2 className="text-xl font-bold mb-4">Sign Up</h2>
+            <form onSubmit={e => { e.preventDefault(); handleSignup(); }}>
+              <label htmlFor="signup-email" className="block text-gray-300 mb-1">Email</label>
+              <input
+                id="signup-email"
+                type="email"
+                placeholder="Email"
+                value={signupEmail}
+                onChange={e => setSignupEmail(e.target.value)}
+                className="mb-3 p-3 rounded w-full bg-gray-900 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-red-600"
+                autoComplete="email"
+                required
+              />
+              <label htmlFor="signup-password" className="block text-gray-300 mb-1">Password</label>
+              <input
+                id="signup-password"
+                type="password"
+                placeholder="Password"
+                value={signupPassword}
+                onChange={e => setSignupPassword(e.target.value)}
+                className="mb-3 p-3 rounded w-full bg-gray-900 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-red-600"
+                autoComplete="new-password"
+                required
+              />
+              <button
+                type="submit"
+                className="w-full h-14 bg-red-700 text-white font-semibold rounded-lg shadow-lg hover:bg-red-600 transition-all duration-200 border-0 text-lg"
+              >
+                Create Account
+              </button>
+            </form>
+            {signupError && <div className="text-red-500 mt-2">{signupError}</div>}
+            {signupSuccess && <div className="text-green-500 mt-2">{signupSuccess}</div>}
+          </div>
         </div>
       </div>
     );
@@ -131,6 +249,43 @@ export default function Layout({ children, currentPageName }) {
             >
               <LogOut className="w-4 h-4 text-gray-400" />
             </Button>
+            {user && user.role !== 'admin' && (
+              <>
+                <Button
+                  onClick={() => setShowAdminModal(true)}
+                  className="ml-2 bg-yellow-700 text-white font-semibold rounded-lg shadow-lg hover:bg-yellow-600 transition-all duration-200 border-0 text-sm px-4 py-2"
+                >
+                  Admin Access
+                </Button>
+                {showAdminModal && (
+                  <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+                    <div className="bg-gray-800 p-8 rounded-xl shadow-2xl text-center w-full max-w-xs border border-gray-700">
+                      <h2 className="text-xl font-bold text-white mb-4">Admin Access</h2>
+                      <input
+                        type="password"
+                        placeholder="Enter admin password"
+                        value={adminPassword}
+                        onChange={e => setAdminPassword(e.target.value)}
+                        className="mb-3 p-3 rounded w-full bg-gray-900 border border-gray-700 text-white"
+                      />
+                      <button
+                        onClick={handleAdminPromotion}
+                        className="w-full h-12 bg-red-700 text-white font-semibold rounded-lg shadow-lg hover:bg-red-600 transition-all duration-200 border-0 text-lg"
+                      >
+                        Promote to Admin
+                      </button>
+                      {adminError && <div className="text-red-500 mt-2">{adminError}</div>}
+                      <button
+                        onClick={() => setShowAdminModal(false)}
+                        className="mt-3 text-gray-400 hover:text-white text-sm underline"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
           </div>
         </div>
       </header>

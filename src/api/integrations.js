@@ -1,19 +1,12 @@
-import { base44 } from './base44Client';
+// Integrations can be implemented using Firebase Cloud Functions or third-party APIs as needed.
 
-
-
-
-export const Core = base44.integrations.Core;
-
-export const InvokeLLM = base44.integrations.Core.InvokeLLM;
-
-export const SendEmail = base44.integrations.Core.SendEmail;
-
-export const UploadFile = base44.integrations.Core.UploadFile;
-
-export const GenerateImage = base44.integrations.Core.GenerateImage;
-
-export const ExtractDataFromUploadedFile = base44.integrations.Core.ExtractDataFromUploadedFile;
+// Example stubs:
+export const Core = {};
+export const InvokeLLM = () => { throw new Error('Not implemented. Use a Cloud Function or external API.'); };
+export const SendEmail = () => { throw new Error('Not implemented. Use a Cloud Function or external API.'); };
+export const UploadFile = () => { throw new Error('Not implemented. Use Firebase Storage or a Cloud Function.'); };
+export const GenerateImage = () => { throw new Error('Not implemented. Use a Cloud Function or external API.'); };
+export const ExtractDataFromUploadedFile = () => { throw new Error('Not implemented. Use a Cloud Function or external API.'); };
 
 
 
