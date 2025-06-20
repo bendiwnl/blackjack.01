@@ -1,4 +1,4 @@
-# Neumorphic Blackjack
+# Blackjack Royal
 
 This app is a Vite+React blackjack game that uses Firebase for its backend (authentication and database).
 
