@@ -1,20 +1,22 @@
-# Base44 App
+# Neumorphic Blackjack
 
+This app is a Vite+React blackjack game that uses Firebase for its backend (authentication and database).
 
-This app was created automatically by Base44.
-It's a Vite+React app that communicates with the Base44 API.
+## Features
+- Multiplayer blackjack gameplay
+- Dealer and admin panels
+- Wallet and transaction management
+- Firebase Auth and Firestore integration
 
-## Running the app
+## Getting Started
+1. Clone the repo
+2. Run `npm install`
+3. Add your Firebase config to `src/api/firebaseClient.js`
+4. Run `npm run dev` to start the app
 
-```bash
-npm install
-npm run dev
-```
+## Deployment
+Deploy easily to Firebase Hosting or any static hosting provider.
 
-## Building the app
+---
 
-```bash
-npm run build
-```
-
-For more information and support, please contact Base44 support at app@base44.com.
+For more information, see the Firebase documentation.
